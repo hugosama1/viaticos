@@ -23,13 +23,16 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_main, container, false);
 
-        EditText txtPassword =(EditText)view.findViewById(R.id.txtPassword);
+        final EditText txtPassword =(EditText)view.findViewById(R.id.txtPassword);
+        final EditText txtEmail =(EditText)view.findViewById(R.id.txtEmail);
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Snackbar snackbar = Snackbar
-                        .make(getActivity().findViewById(R.id.coordinatorLayout), "LOGIN", Snackbar.LENGTH_LONG);
-                snackbar.show();
+                FetchViaticosTask task = new FetchViaticosTask(getContext());
+                String user = txtEmail.getText().toString();
+                String pass = txtPassword.getText().toString();
+                String action = "login";
+                task.execute(action,user,pass);
                 return false;
             }
         });
