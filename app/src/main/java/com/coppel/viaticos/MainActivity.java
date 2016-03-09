@@ -1,10 +1,8 @@
 package com.coppel.viaticos;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,15 +12,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        SharedPreferences userPreferences = getSharedPreferences("userdetails",MODE_PRIVATE);
-        String token = userPreferences.getString("token",null);
-        if( token == null )
-            startActivity( new Intent(this,LoginActivity.class));
+
+        if( new UserLoginTask(this).isTokenSet())
+            startActivity(new Intent(this, ViajesActivity.class));
         else
-            startActivity(new Intent(this,ViajesActivity.class));
-}
+            startActivity( new Intent(this,LoginActivity.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

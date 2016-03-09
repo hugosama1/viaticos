@@ -3,25 +3,20 @@ package com.coppel.viaticos;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,16 +27,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +38,6 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private String LOG_TAG = LoginActivity.class.getSimpleName();
-
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -200,7 +184,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(this,email, password){
+                @Override
+                protected void onPostExecute(final Boolean success) {
+                    mAuthTask = null;
+                    showProgress(false);
+
+                    if (success) {
+                        startActivity( new Intent(LoginActivity.this,ViajesActivity.class));
+                        finish();
+                    } else {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                }
+                @Override
+                protected void onCancelled() {
+                    mAuthTask = null;
+                    showProgress(false);
+                }
+            };
             mAuthTask.execute((Void) null);
         }
     }
@@ -299,131 +302,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            JSONObject jsonResponse=null;
-            // Will contain the raw JSON response as a string.
-            String response = null;
-
-            try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
-                final String LOGIN_URL =
-                        "http://192.168.1.70/auth/authenticate?";
-                final String USER_PARAM = "email";
-                final String PASSWORD_PARAM = "password";
-
-                Uri builtUri = Uri.parse(LOGIN_URL).buildUpon()
-                        .appendQueryParameter(USER_PARAM, mEmail)
-                        .appendQueryParameter(PASSWORD_PARAM, mPassword)
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-
-                // Create the request
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setDoOutput(true);
-                urlConnection.setRequestMethod("POST");
-                urlConnection.connect();
-
-                InputStream inputStream = null;
-                // Read the input stream into a String
-                int code = urlConnection.getResponseCode();
-                if( code >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                    return false;
-                } else {
-                    inputStream = urlConnection.getInputStream();
-                }
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                jsonResponse = new JSONObject(buffer.toString());
-                String token = jsonResponse.getString("token");
-                SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-                SharedPreferences.Editor edit = userDetails.edit();
-                edit.clear();
-                edit.putString("email", mEmail);
-                edit.putString("password", mPassword);
-                edit.putString("token", token);
-                edit.commit();
-                return true;
-            } catch (FileNotFoundException e) {
-                Log.e(LOG_TAG, "ERROR : " + e.getMessage(), e);
-            }catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                startActivity( new Intent(LoginActivity.this,ViajesActivity.class));
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 }
 

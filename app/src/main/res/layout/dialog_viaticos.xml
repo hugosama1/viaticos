@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <EditText
-        android:id="@+id/txtDescViaje"
+        android:id="@+id/txtDescViaticos"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,23 +13,21 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
         android:hint="Descripcion" />
-    <EditText
-        android:id="@+id/dtInicioViaje"
-        android:inputType="number|textPassword"
-        android:digits="0123456789/"
+    <Spinner
+        android:id="@+id/cmbConceptos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:prompt="@string/spinner_viaticos_conceptos"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
-        android:hint="Inicio del viaje"/>
+        android:hint="Conceptos"/>
 
     <EditText
-        android:id="@+id/dtFinViaje"
-        android:inputType="number|textPassword"
-        android:digits="0123456789/"
+        android:id="@+id/txtCantidad"
+        android:inputType="numberDecimal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -37,5 +35,19 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
-        android:hint="Fin del viaje"/>
+        android:hint="Cantidad"/>
+
+
+    <EditText
+        android:id="@+id/txtIva"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif"
+        android:hint="Iva"/>
+
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.coppel.viaticos.data;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.format.Time;
@@ -31,8 +32,13 @@ public class ViaticosContract {
         public static final String COLUMN_DESCRIPCION = "descripcion";
         public static final String COLUMN_FECHA_INICIO="fecha_inicio";
         public static final String COLUMN_FECHA_FIN="fecha_fin";
+        public static final String COLUMN_SERVER_ID = "server_id";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_UPDATED_AT = "updated_at";
+
+        public static Uri buildViajesUri(long viaje_id) {
+            return ContentUris.withAppendedId(CONTENT_URI,viaje_id);
+        }
     }
     public static final class ConceptosEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
@@ -63,14 +69,30 @@ public class ViaticosContract {
         public static final String TABLE_NAME = "viaticos";
 
         public static final String COLUMN_VIAJE_ID = "viaje_id";
-        public static final String COLUMNS_CONCEPTO_ID = "concepto_id";
+        public static final String COLUMN_CONCEPTO_ID = "concepto_id";
+        public static final String COLUMN_DESCRIPCION = "descripcion";
         public static final String COLUMN_CANTIDAD = "cantidad";
         public static final String COLUMN_IVA = "iva";
+        public static final String COLUMN_SERVER_ID = "server_id";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_UPDATED_AT = "updated_at";
 
+        public static final String QUERY_COLUMN_DESCRIPCION = TABLE_NAME + ".descripcion";
+        public static final String QUERY_COLUMN_CONCEPTO = ConceptosEntry.TABLE_NAME + ".descripcion AS concepto";
+        public static final String QUERY_COLUMN_ID = TABLE_NAME + "." + _ID;
+
+        public static final String COLUMN_CONCEPTO_ALT ="concepto";
+
         public static Uri buildViaticosViaje(long viaje_id) {
             return CONTENT_URI.buildUpon().appendPath(String.valueOf(viaje_id)).build();
+        }
+
+        public static Uri buildViaticosUri(long viaje_id,long viatico_id) {
+            return ContentUris.withAppendedId(CONTENT_URI.buildUpon().appendPath(String.valueOf(viaje_id)).build(), viatico_id);
+        }
+
+        public static long getViajeFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
 
     }

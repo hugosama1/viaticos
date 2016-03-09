@@ -5,8 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="btnAddViaje">Agregar Viaje</string>
     <string name="title_activity_login">Viaticos</string>
-
-    <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Entrar</string>
@@ -18,4 +16,8 @@
     <string name="permission_rationale">"Se requiere permisos en los contactos"</string>
     <string name="aceptar">aceptar</string>
     <string name="cancelar">cancelar</string>
+    <string name="formato_fecha">"El formato de fecha debe ser :"</string>
+    <string name="title_activity_viaticos">Viaticos</string>
+    <string name="spinner_viaticos_conceptos">Concepto</string>
+    <string name="action_sync">Sync</string>
 </resources>
